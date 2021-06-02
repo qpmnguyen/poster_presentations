@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+
+<title>cILR: Taxonomic Enrichment Analysis with Isometric Log Ratios</title>
+
+<script src="poster_files/header-attrs-2.7/header-attrs.js"></script>
+
+
+
+
+
+<!--
+Font-awesome icons ie github or twitter
+-->
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/brands.css" integrity="sha384-n9+6/aSqa9lBidZMRCQHTHKJscPq6NW4pCQBiMmHdUCvPN8ZOg2zJJTkC7WIezWv" crossorigin="anonymous">
+
+<!--
+Google fonts api stuff
+-->
+<link href='https://fonts.googleapis.com/css?family=Roboto' rel='stylesheet'>
+<link href='https://fonts.googleapis.com/css?family=Karla' rel='stylesheet'>
+
+<!--
+Here are the required style attributes for css to make this poster work :)
+-->
+<style>
+@page {
+size: 48in 36in;
+margin: 0;
+padding: 0;
+background-color: #ffffff;
+}
+body {
+margin: 0px;
+padding: 0px;
+width: 48in;
+height: 36in;
+text-align: justify;
+font-size: 30pt;
+background-color: #FFFFFF;
+color: #000000;
+}
+/* RMarkdown Class Styles */
+/* center align leaflet map,
+from https://stackoverflow.com/questions/52112119/center-leaflet-in-a-rmarkdown-document */
+.html-widget {
+margin: auto;
+position: sticky;
+margin-top: 2cm;
+margin-bottom: 2cm;
+}
+.leaflet.html-widget.html-widget-static-bound.leaflet-container.leaflet-touch.leaflet-fade-anim.leaflet-grab.leaflet-touch-drag.leaflet-touch-zoom {
+position: sticky;
+width: 100%;
+}
+pre.sourceCode.r, pre.sourceCode.python {
+background-color: #ffffff20;
+border: solid ##00693e 1mm;
+border-radius: 0.5em;
+padding: 4mm;
+margin: auto;
+margin-top: 1em;
+margin-bottom: 1em;
+/* align-items: center; */
+}
+div.sourceCode {
+background-color: transparent;
+width: 85%;
+margin-left: auto;
+margin-right: auto;
+}
+code.sourceCode.r, code.sourceCode.python {
+background-color: transparent;
+font-size: 20pt;
+border-radius: 2mm;
+}
+code {
+font-size: 25pt;
+font-family: monospace;
+background-color: ##00693e24;
+color: ##00693e;
+padding: 1.2mm;
+line-height: 1;
+border-radius: 2mm;
+}
+caption {
+margin-bottom: 10px;
+font-size: 20pt;
+font-style: italic;
+}
+
+tbody tr:nth-child(odd) {
+    background-color: #00693e20;
+}
+.table>thead>tr>th, .table>tbody>tr>th, .table>tfoot>tr>th, .table>thead>tr>td, .table>tbody>tr>td, .table>tfoot>tr>td{
+  border-spacing: 0;
+  font-size: 40%;
+  border-style: none;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-right: 1em;
+  padding-left: 1em;
+  line-height: 1em;
+}
+table {
+  margin: auto;
+}
+th {
+  padding-left: 5mm;
+  padding-right: 5mm;
+}
+.caption {
+font-size: 20pt;
+font-style: italic;
+padding-top: 0;
+}
+.references {
+font-size: 20px;
+line-height: 90%;
+}
+/* Create three unequal columns that floats next to each other */
+.column {
+float: left;
+padding: 0px;
+}
+.outer {
+width: 48in;
+height: 36in;
+-webkit-column-count: 2; /* Chrome, Safari, Opera */
+-moz-column-count: 2; /* Firefox */
+column-count: 2;
+-webkit-column-fill: auto;
+-moz-column-fill: auto;
+column-fill: auto;
+-webkit-column-rule-width: 0.4;
+-moz-column-rule-width: 0.4;
+column-rule-width: 0.4;
+-webkit-column-rule-style: solid;
+-moz-column-rule-style: solid;
+column-rule-style: solid;
+-webkit-column-rule-color: black;
+-moz-column-rule-color: black;
+column-rule-color: black;
+-webkit-column-gap: calc(0.4 * 100%);
+background-color: #ffffff;
+font-family: Karla;
+color: #000000;
+}
+span.citation {
+  color: ##00693e;
+  font-weight: bold;
+}
+a {
+text-decoration: none;
+color: ##00693e;
+}
+#title {
+font-size: 75pt;
+text-align: left;
+margin: 0;
+line-height: 90%;
+border-bottom: 0;
+}
+#author {
+color: #00693e;
+margin: 0;
+text-align: left;
+line-height: 65%;
+font-size: 1.17em;
+}
+#affiliation {
+padding-top: 1em;
+color: #00000060;
+font-style: italic;
+font-size: 25px;
+margin: 0;
+}
+sup {
+color: #cc0000;
+}
+.affiliation sup {
+font-size: 20px;
+}
+.author sup {
+font-size: 30px;
+}
+.author_extra {
+color: ##00693e;
+margin: 0;
+line-height: 85%;
+font-size: 35px;
+}
+.outer h1 {
+text-align: center;
+margin-top: 0.5in;
+margin-bottom: 0.5in;
+}
+.outer h2 {
+text-align: center;
+}
+.outer p {
+color: #000000;
+}
+.outer ol {
+text-align: left;
+}
+.main {
+width: calc(48in * 0.4);
+height: 36in;
+position: absolute;
+margin-left: calc(48in * ((1 - 0.4) / 2));
+background-color: #00693e;
+color: #FFFFFF90;
+font-family: Roboto;
+background-image: linear-gradient(#00693e 50%, ##00693e);
+}
+.main strong {
+color: #FFFFFF;
+}
+img.main-img-left {
+width: 20%;
+left: 0.5in;
+bottom: 0.2in;
+position: absolute;
+}
+img.main-img-right {
+width: 18%;
+right: 0.5in;
+bottom: 0.2in;
+position: absolute;
+}
+.main p {
+padding-top: 20%;
+font-size: 70pt;
+text-align: left;
+}
+.fab {
+color: #00000060;
+font-size: 25px;
+}
+.twitter, i {
+color: #00000060;
+font-size: 35px;
+text-decoration: none;
+}
+a.email {
+text-decoration: none;
+color: #00000060;
+font-size: 35px;
+}
+.envelope {
+color: #00000060;
+font-size: 5px;
+text-decoration: none;
+}
+.globe {
+color: #00000060;
+font-size: 5px;
+text-decoration: none;
+}
+.github > .fab {
+color: #00000060;
+font-size: 40px;
+text-decoration: none;
+}
+.globetext {
+color: #00000060;
+font-size: 35px;
+text-decoration: none;
+}
+.poster_wrap {
+width: 48in;
+height: 36in;
+padding: 0cm;
+background-color: #ffffff;
+}
+span > #tab:mytable {
+  font-weight: bold;
+}
+.section {
+  padding-left: 10mm;
+  padding-right: 10mm;
+}
+.main p {
+  padding-left: 30mm;
+  padding-right: 30mm;
+}
+.main_pic {
+  width: 105%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+.orcid img {
+  width: 3%;
+}
+</style>
+</head>
+<body>
+
+
+<div class="poster_wrap">
+<div class="column outer">
+<br>
+<div class="title section">
+<h1 id="title">cILR: Taxonomic Enrichment Analysis with Isometric Log Ratios</h1>
+<br>
+<h3 id="author" class="author">
+
+  </h3>
+
+<h5 id="author_extra" class="author_extra">
+Quang Nguyen<sup>1 2</sup>
+ Anne G. Hoen<sup>1 2</sup>
+ H. Robert Frost<sup>2</sup>
+</h5>
+
+<p id="affiliation" class="affiliation">
+<sup>1</sup> Department of Epidemiology, Dartmouth College<br> <sup>2</sup> Department of Biomedical Data Science, Dartmouth College
+</p>
+
+</div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<ul>
+<li>Standard microbiome analyses often aggregate variables to sets, commonly Linnean taxonomic categories (e.g. Phylum) identified through sequence classification. Aggregation can help with standard challenges with microbiome relative abundance data, such as high-dimensionality and sparsity.<br />
+</li>
+<li>However, most researchers perform aggregation through the pairwise summation of counts, preventing comparison across sets of different sizes. Count-based aggregation methods also do not preserve inter-sample distances, due to fact that microbiome data is uniquely compositional.<br />
+</li>
+<li>Here we developed a method to aggregate variables through computing a competitive enrichment score, comparing those inside the set and those outside the set.</li>
+</ul>
+</div>
+<div id="acknowledgements" class="section level2">
+<h2>Acknowledgements</h2>
+<p>This research is supported by funding from the National Institutes of Health (grants NLM R01LM012723, NIGMS P20GM104416, NLM K01LM012426 NIH UG3 OD023275, NIEHS P01ES022832 and EPA RD-83544201).</p>
+</div>
+<div id="results" class="section level2">
+<h2>Results</h2>
+<div id="sample-level-significance-testing" class="section level3">
+<h3>Sample-level significance testing</h3>
+<div class="figure" style="text-align: left"><span id="fig:figure1"></span>
+<img src="poster_files/figure-html/figure1-1.png" alt="Type I error and power of sample-level enrichment testing using cILR compared against a naive Wilcoxon Rank Sum test. Panel **(A)** presents type I error evaluated in parametric simulations under different set sizes, inter-taxa correlation and sparsity. Panel **(B)** presents power evaluated in parametric simulations under different effect sizes, inter-taxa correlation and sparsity.  For panels **(C)** and **(D)**, we utilized the the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project where supragingival sites are known to have enriched aerobic microbes. Here, we test for the enrichment of aerobic microbes across all samples, and considered a true positive is when a sample is significantly enriched for aerobic microbes and labelled as supragingival." width="100%" />
+<p class="caption">
+Figure 1: Type I error and power of sample-level enrichment testing using cILR compared against a naive Wilcoxon Rank Sum test. Panel <strong>(A)</strong> presents type I error evaluated in parametric simulations under different set sizes, inter-taxa correlation and sparsity. Panel <strong>(B)</strong> presents power evaluated in parametric simulations under different effect sizes, inter-taxa correlation and sparsity. For panels <strong>(C)</strong> and <strong>(D)</strong>, we utilized the the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project where supragingival sites are known to have enriched aerobic microbes. Here, we test for the enrichment of aerobic microbes across all samples, and considered a true positive is when a sample is significantly enriched for aerobic microbes and labelled as supragingival.
+</p>
+</div>
+</div>
+<div id="classification-capacity" class="section level3">
+<h3>Classification capacity</h3>
+<div class="figure" style="text-align: left"><span id="fig:figure2"></span>
+<img src="poster_files/figure-html/figure2-1.png" alt="Classification power of cILR scores compared against existing methods in the gene set testing literature that generates single sample enrichment scores. Area under the ROC curve (AUC) measures whether scores highly rank samples where the set of interest is known to be enriched. Panel **(A)** presents results under different parametric simulation conditions while panel **(B)** presents similar analyses on the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project. In this data set, supragingival sites are known to have enriched aerobic microbes." width="100%" />
+<p class="caption">
+Figure 2: Classification power of cILR scores compared against existing methods in the gene set testing literature that generates single sample enrichment scores. Area under the ROC curve (AUC) measures whether scores highly rank samples where the set of interest is known to be enriched. Panel <strong>(A)</strong> presents results under different parametric simulation conditions while panel <strong>(B)</strong> presents similar analyses on the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project. In this data set, supragingival sites are known to have enriched aerobic microbes.
+</p>
+</div>
+</div>
+<div id="utilizing-enrichment-scores-for-disease-prediction" class="section level3">
+<h3>Utilizing enrichment scores for disease prediction</h3>
+<div class="figure" style="text-align: left"><span id="fig:figure3"></span>
+<img src="poster_files/figure-html/figure3-1.png" alt="Classification performance of a standard random forest model using cILR scores compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn's disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing [@gevers2014] and whole genome shotgun sequencing [@nielsen2014]" width="100%" />
+<p class="caption">
+Figure 3: Classification performance of a standard random forest model using cILR scores compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn’s disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing <span class="citation">(<a href="#ref-gevers2014" role="doc-biblioref">Gevers et al. 2014</a>)</span> and whole genome shotgun sequencing <span class="citation">(<a href="#ref-nielsen2014" role="doc-biblioref">Nielsen et al. 2014</a>)</span>
+</p>
+</div>
+</div>
+</div>
+<div id="methods" class="section level2">
+<h2>Methods</h2>
+<p><img src="poster_diagrams_white.png" width="100%" style="display: block; margin: auto;" /></p>
+</div>
+<div id="references" class="section level2 unnumbered">
+<h2>References</h2>
+<div id="refs" class="references csl-bib-body hanging-indent">
+<div id="ref-gevers2014" class="csl-entry">
+Gevers, Dirk, Subra Kugathasan, Lee A. Denson, Yoshiki Vázquez-Baeza, Will Van Treuren, Boyu Ren, Emma Schwager, et al. 2014. <span>“The <span>Treatment</span>-<span>Naive Microbiome</span> in <span>New</span>-<span>Onset Crohn</span>’s <span>Disease</span>.”</span> <em>Cell Host &amp; Microbe</em> 15 (3): 382–92. <a href="https://doi.org/10.1016/j.chom.2014.02.005">https://doi.org/10.1016/j.chom.2014.02.005</a>.
+</div>
+<div id="ref-nielsen2014" class="csl-entry">
+Nielsen, H. Bjørn, Mathieu Almeida, Agnieszka Sierakowska Juncker, Simon Rasmussen, Junhua Li, Shinichi Sunagawa, Damian R. Plichta, et al. 2014. <span>“Identification and Assembly of Genomes and Genetic Elements in Complex Metagenomic Samples Without Using Reference Genomes.”</span> <em>Nature Biotechnology</em> 32 (8): 822–28. <a href="https://doi.org/10.1038/nbt.2939">https://doi.org/10.1038/nbt.2939</a>.
+</div>
+</div>
+</div>
+
+</div>
+<div class="main">
+<p>Our method leverages the <strong>isometric log ratio transformation</strong> to <strong>generate enrichment scores for taxa sets</strong> that can be used for standard microbiome analyses while also allowing for <strong>sample-level significance testing</strong> under a <strong>competitive null hypothesis</strong><br><br> <img src="nice_graphic.png" class="main_pic" /></p>
+
+
+</div>
+</div>
+
+
+
+</body>
+</html>

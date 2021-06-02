@@ -1,0 +1,289 @@
+---
+title: "cILR: Taxonomic Enrichment Analysis with Isometric Log Ratios"
+author:
+  - name: Quang Nguyen
+    affil: 1 2
+    twitter: quangpmnguyen
+    email: quang.p.nguyen.gr@dartmouth.edu
+  - name: Anne G. Hoen 
+    affil: 1 2  
+  - name: H. Robert Frost 
+    affil: 2 
+affiliation:
+  - num: 1
+    address: Department of Epidemiology, Dartmouth College
+  - num: 2 
+    address: Department of Biomedical Data Science, Dartmouth College
+main_findings:
+#  - "**Aggregating taxonomic variables** into sets can **alleviate challenges of high-dimensionality and #sparsity** in microbiome relative abundance data"
+  - "Our method leverages the **isometric log ratio transformation** to **generate enrichment scores for taxa sets** that can be used for standard microbiome analyses while also allowing for **sample-level significance testing** under a **competitive null hypothesis**"
+  - "![](nice_graphic.png){.main_pic}"
+main_picwidth: "105%"
+output: 
+  posterdown::posterdown_betterland:
+    self_contained: false
+    pandoc_args: --mathjax
+    highlight: haddock
+    number_sections: false
+link-citations: true
+bibliography: tax_agg.bib
+poster_height: "36in"
+poster_width: "48in"
+font_family: Karla
+primary_colour: "#00693e"
+secondary_colour: "##00693e"
+# Controlling font family for the middle section 
+main_fontfamily: Roboto 
+knit: pagedown::chrome_print
+title_textsize: "75pt"
+main_width: 0.4
+main_textsize: "70pt"
+body_textsize: "30pt"
+
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(results = 'asis',
+                      echo = FALSE,
+                      warning = FALSE,
+                      tidy = FALSE,
+                      message = FALSE,
+                      fig.align = 'center',
+                      out.width = "100%")
+options(knitr.table.format = "html") 
+#thematic::thematic_rmd(bg = "#00693e", font = "Karla")
+```
+
+```{r setup}
+library(tidyverse)
+library(ggsci)
+library(patchwork)
+library(glue)
+```
+
+## Introduction
+
+- Standard microbiome analyses often aggregate variables to sets, commonly Linnean taxonomic categories (e.g. Phylum) identified through sequence classification. Aggregation can help with standard challenges with microbiome relative abundance data, such as high-dimensionality and sparsity.   
+- However, most researchers perform aggregation through the pairwise summation of counts, preventing comparison across sets of different sizes. Count-based aggregation methods also do not preserve inter-sample distances, due to fact that microbiome data is uniquely compositional.   
+- Here we developed a method to aggregate variables through computing a competitive enrichment score, comparing those inside the set and those outside the set. 
+
+## Acknowledgements    
+This research is supported by funding from the National Institutes of Health (grants NLM R01LM012723, NIGMS P20GM104416, NLM K01LM012426 NIH UG3 OD023275, NIEHS P01ES022832 and EPA RD-83544201).
+
+## Results  
+
+### Sample-level significance testing 
+
+```{r figure1, fig.align = "left", fig.width = 8, fig.height = 7, fig.cap = "Type I error and power of sample-level enrichment testing using cILR compared against a naive Wilcoxon Rank Sum test. Panel **(A)** presents type I error evaluated in parametric simulations under different set sizes, inter-taxa correlation and sparsity. Panel **(B)** presents power evaluated in parametric simulations under different effect sizes, inter-taxa correlation and sparsity.  For panels **(C)** and **(D)**, we utilized the the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project where supragingival sites are known to have enriched aerobic microbes. Here, we test for the enrichment of aerobic microbes across all samples, and considered a true positive is when a sample is significantly enriched for aerobic microbes and labelled as supragingival."}
+
+
+load_and_process <- function(type = c("fdr", "pwr")){
+  type <- match.arg(type)
+  real_data <- readRDS(file = glue("../../teailr/analyses/data_single_sample/output/{type}_comparison.rds",
+                                   type = type))
+  sim_grid <- readRDS(file = glue( "../../teailr/analyses/simulations_single_sample_{type}/output/simulation_grid_{type}.rds", 
+                                       type = type))
+  sim_results <- readRDS(file = glue( "../../teailr/analyses/simulations_single_sample_{type}/output/sim_ss_{type}.rds", 
+                                       type = type))
+  full_data <- full_join(sim_grid, sim_results, by = "id")
+  full_data <- full_data %>% unite(model, c("model", "distr")) %>% 
+    mutate(model = case_when(
+      model == "cilr_mnorm" ~ "cILR Mixture Normal",
+      model == "cilr_norm" ~ "cILR Normal", 
+      model == "wilcox_NA" ~ "Wilcoxon Rank Sum"
+    )) %>% 
+    mutate(adj = replace_na(adj, "Not applicable")) %>% 
+    rename("Correlation" = "s_rho", "Effect Size" = "eff_size", "Set Size" = "n_inflate")
+  
+  if (type == "pwr"){
+    full_data <- full_data %>% mutate(est = case_when(
+      adj == "FALSE" ~ NA_real_,
+      model == "Wilcoxon Rank Sum" ~ NA_real_,
+      TRUE ~ est
+    ), upper = case_when(
+      adj == "FALSE" ~ NA_real_,
+      model == "Wilcoxon Rank Sum" ~ NA_real_,
+      TRUE ~ upper
+    ), lower = case_when(
+      adj == "FALSE" ~ NA_real_,
+      model == "Wilcoxon Rank Sum" ~ NA_real_,
+      TRUE ~ lower
+    ))
+  }
+  
+  
+  
+  
+  real_data <- real_data %>% unite(models, c("models", "distr")) %>% 
+    mutate(model = case_when(
+      models == "cilr_mnorm" ~ "cILR Mixture Normal",
+      models == "cilr_norm" ~ "cILR Normal", 
+      models == "wilcox_NA" ~ "Wilcoxon Rank Sum"
+    )) %>% 
+    mutate(adj = replace_na(adj, "Not applicable")) 
+  
+  sim_plots <- ggplot(full_data, aes(x = spar, y = est, col = model, shape = adj)) + 
+    geom_line() + 
+    geom_pointrange(aes(ymax = upper, ymin = lower)) + theme_bw() + scale_color_d3() + 
+    guides(linetype = guide_legend(override.aes = list(shape = NA))) + ylim(c(0,1))
+  
+  if (type == "fdr"){
+    sim_plots <- sim_plots + facet_grid(`Correlation` ~ `Set Size`, labeller = label_both) + 
+      labs(x = "Sparsity", y = "Type I error", col = "Models", shape = "Correlation adjusted") +
+      geom_hline(yintercept = 0.05, col = "red")
+  } else if (type == "pwr"){
+    sim_plots <- sim_plots + facet_grid(`Correlation` ~ `Effect Size`, labeller = label_both) + 
+      labs(x = "Sparsity", y = "Power", col = "Models", shape = "Correlation adjusted") + 
+      geom_hline(yintercept = 0.8, col = "red")
+  }
+  
+  data_plot <- ggplot(real_data, aes(x = model, y = est, col = model, shape = adj)) + 
+    geom_line() + 
+    geom_pointrange(aes(ymin = lower, ymax = upper), position = position_dodge(width = 0.5)) + 
+    scale_color_d3() +
+    guides(linetype = guide_legend(override.aes = list(shape = NA))) + theme_bw() + ylim(c(0,1))
+  
+  if (type == "fdr"){
+    data_plot <- data_plot + 
+      labs(x = "Models", y = "False Positive Rate", color = "Models", shape = "Correlation adjusted") + 
+      geom_hline(yintercept = 0.05, col = "red")
+  } else if (type == "pwr"){
+    data_plot <- data_plot + 
+      labs(x = "Models", y = "True Positive Rate", color = "Models", shape = "Correlation adjusted") + 
+      geom_hline(yintercept = 0.8, col = "red")
+  }
+  data_plot <- data_plot + coord_flip()
+  return(list(data_plot = data_plot, sim_plot = sim_plots))
+}
+
+fdr <- load_and_process("fdr")
+pwr <- load_and_process("pwr")
+
+layout <- "
+AA#
+AAC
+AAC
+BBD
+BBD
+BB#
+"
+comb_plot <- fdr$sim_plot + pwr$sim_plot + fdr$data_plot + pwr$data_plot + 
+  plot_layout(guides = "collect", design = layout, widths = c(2,1)) + 
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom", legend.box = "vertical", legend.margin = margin())
+
+comb_plot
+```
+
+### Classification capacity   
+
+```{r figure2, fig.align = "left", fig.width = 8, fig.height = 6, fig.cap = "Classification power of cILR scores compared against existing methods in the gene set testing literature that generates single sample enrichment scores. Area under the ROC curve (AUC) measures whether scores highly rank samples where the set of interest is known to be enriched. Panel **(A)** presents results under different parametric simulation conditions while panel **(B)** presents similar analyses on the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project. In this data set, supragingival sites are known to have enriched aerobic microbes."}
+auc_data <- readRDS(file = "../../teailr/analyses/data_single_sample/output/auc_comparison.rds")
+sim_auc_grid <- readRDS(file = "../../teailr/analyses/simulations_single_sample_auc/output/simulation_grid_auc.rds")
+sim_auc_results <- readRDS(file = "../../teailr/analyses/simulations_single_sample_auc/output/sim_ss_auc.rds")
+full_data <- full_join(sim_auc_grid, sim_auc_results, by = "id")
+full_data <- full_data %>% unite(model, c("model", "distr")) %>% 
+  mutate(model = case_when(
+    model == "cilr_mnorm" ~ "cILR Mixture Normal",
+    model == "cilr_norm" ~ "cILR Normal", 
+    model == "gsva_NA" ~ "GSVA", 
+    model == "ssgsea_NA" ~ "ssGSEA"
+  )) %>% 
+   mutate(output = case_when(
+    output == "cdf" ~ "CDF",
+    output == "zscore" ~ "z-scores",
+    is.na(output) ~ "Not applicable"
+  )) %>% 
+  mutate(adj = replace_na(adj, "Not applicable")) %>% 
+  rename("Correlation" = "s_rho", "Effect Size" = "eff_size")
+
+auc_data <- auc_data %>% unite(models, c("models", "distr")) %>% 
+  mutate(model = case_when(
+    models == "cilr_mnorm" ~ "cILR Mixture Normal",
+    models == "cilr_norm" ~ "cILR Normal", 
+    models == "gsva_NA" ~ "GSVA", 
+    models == "ssgsea_NA" ~ "ssGSEA"
+  )) %>% 
+  mutate(output = case_when(
+    output == "cdf" ~ "CDF",
+    output == "zscore" ~ "z-scores",
+    is.na(output) ~ "Not applicable"
+  )) %>% 
+  mutate(adj = replace_na(adj, "Not applicable")) 
+
+sim_plot <- ggplot(full_data, aes(x = spar, y = est, col = model, linetype = adj, shape = output)) +
+  geom_line() + 
+  geom_pointrange(aes(ymax = upper, ymin = lower)) + 
+  facet_grid(`Correlation` ~ `Effect Size`, labeller = label_both) + theme_bw() + scale_color_d3() + 
+  labs(x = "Sparsity", y = "AUC", col = "Models", linetype = "Correlation adjusted", shape = "Output type") +
+  guides(linetype = guide_legend(override.aes = list(shape = NA))) +
+  ylim(0.6,1)
+
+data_plot <- ggplot(auc_data, aes(x = model, y = est, col = model, linetype = adj, shape = output)) + 
+  geom_line() + 
+  geom_pointrange(aes(ymin = lower, ymax = upper), position = position_dodge(width = 0.5)) + 
+  labs(x = "Models", y = "AUC", color = "Models", 
+       shape = "Output type", linetype = "Correlation adjusted") +
+  scale_color_d3() +
+  guides(linetype = guide_legend(override.aes = list(shape = NA))) + theme_bw() + 
+  ylim(c(0.6,1)) + coord_flip()
+
+layout <- "
+AAB
+AAB
+"
+comb_plot <- sim_plot + data_plot + plot_layout(guides = "collect", design = layout) + 
+  plot_annotation(tag_levels = "A") &
+  theme(legend.position = "bottom", legend.box = "vertical", legend.margin = margin())
+comb_plot
+```
+
+### Utilizing enrichment scores for disease prediction  
+
+```{r figure3, fig.align = "left", fig.width = 6, fig.height = 3, fig.cap = "Classification performance of a standard random forest model using cILR scores compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn's disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing [@gevers2014] and whole genome shotgun sequencing [@nielsen2014]"}
+
+real_data <- readRDS(file = "../../teailr/analyses/data_prediction/output/data_prediction.rds")
+
+real_data <- real_data %>% unite(method, c("method", "distr")) %>% 
+  mutate(method = case_when(
+    method == "gsva_NA" ~ "GSVA",
+    method == "clr_NA" ~ "CLR",
+    method == "ssgsea_NA" ~ "ssGSEA", 
+    method == "cilr_mnorm" ~ "cILR Mixture Normal", 
+    method == "cilr_norm" ~ "cILR Normal"
+  ), output = case_when(
+    output == "zscore" ~ "z-score",
+    output == "cdf" ~ "CDF",
+    is.na(output) ~ "Not applicable"
+  ), adj = replace_na(adj,"Not applicable"),
+  dset = case_when(
+    dset == "nielsen_ibd_wgs" ~ "IBD vs Control - WGS",
+    dset == "ackerman_ibd_16S" ~ "IBD vs Control - 16S"
+  )) 
+
+
+ggplot(real_data, aes(x = method, y = auc, col = method, shape = output, linetype = adj)) + 
+  geom_pointrange(aes(ymax = upper, ymin = lower), position = position_dodge(width = 1)) + 
+  facet_grid(~dset) + theme_bw() + 
+  guides(linetype = guide_legend(override.aes = list(shape = NA))) + 
+  scale_color_d3() + 
+  labs(x = "Method", y = "AUC", shape = "Output type", linetype = "Correlation adjusted", 
+       col = "Method") + ylim(c(0.6,1)) +
+  theme(legend.text = element_text(size = 8), 
+        legend.title = element_text(size = 9), 
+        legend.key.size = unit(0.25, "cm")) +
+  coord_flip()
+
+```
+
+
+
+## Methods
+```{r}
+knitr::include_graphics("poster_diagrams_white.png")
+```
+
+ 
+
+## References
+
