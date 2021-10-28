@@ -8,9 +8,9 @@
 
 
 
-<title>cILR: Taxonomic Enrichment Analysis with Isometric Log Ratios</title>
+<title>cILR: Competitive Isometric Log Ratio for Taxonomic Enrichment Analysis</title>
 
-<script src="poster_files/header-attrs-2.7/header-attrs.js"></script>
+<script src="poster_files/header-attrs-2.8/header-attrs.js"></script>
 
 
 
@@ -294,7 +294,7 @@ span > #tab:mytable {
   padding-right: 30mm;
 }
 .main_pic {
-  width: 105%;
+  width: 100%;
   display: block;
   margin-left: auto;
   margin-right: auto;
@@ -311,7 +311,7 @@ span > #tab:mytable {
 <div class="column outer">
 <br>
 <div class="title section">
-<h1 id="title">cILR: Taxonomic Enrichment Analysis with Isometric Log Ratios</h1>
+<h1 id="title">cILR: Competitive Isometric Log Ratio for Taxonomic Enrichment Analysis</h1>
 <br>
 <h3 id="author" class="author">
 
@@ -331,11 +331,11 @@ Quang Nguyen<sup>1 2</sup>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <ul>
-<li>Standard microbiome analyses often aggregate variables to sets, commonly Linnean taxonomic categories (e.g. Phylum) identified through sequence classification. Aggregation can help with standard challenges with microbiome relative abundance data, such as high-dimensionality and sparsity.<br />
+<li>Microbiome data is sparse, compositional, and high-dimensional, which makes it difficult to apply standard statistical techniques. Set-based aggregation from the genomics literature is a well-defined approach to alleviate some of these issues.<br />
 </li>
-<li>However, most researchers perform aggregation through the pairwise summation of counts, preventing comparison across sets of different sizes. Count-based aggregation methods also do not preserve inter-sample distances, due to fact that microbiome data is uniquely compositional.<br />
+<li>Standard practice performs aggregation through abundance summation, but using summation doesn’t allow for comparison of enrichment across sets of different sizes.<br />
 </li>
-<li>Here we developed a method to aggregate variables through computing a competitive enrichment score, comparing those inside the set and those outside the set.</li>
+<li>Here we developed a microbiome specific set-based aggregation method generating enrichment scores at the sample level. We address the compositionality of microbiome data by using the isometric log ratio transformation. Our score is equivalent to a competitive null hypothesis by defining enrichment as a comparison between taxa inside the set and its complement.</li>
 </ul>
 </div>
 <div id="acknowledgements" class="section level2">
@@ -347,27 +347,27 @@ Quang Nguyen<sup>1 2</sup>
 <div id="sample-level-significance-testing" class="section level3">
 <h3>Sample-level significance testing</h3>
 <div class="figure" style="text-align: left"><span id="fig:figure1"></span>
-<img src="poster_files/figure-html/figure1-1.png" alt="Type I error and power of sample-level enrichment testing using cILR compared against a naive Wilcoxon Rank Sum test. Panel **(A)** presents type I error evaluated in parametric simulations under different set sizes, inter-taxa correlation and sparsity. Panel **(B)** presents power evaluated in parametric simulations under different effect sizes, inter-taxa correlation and sparsity.  For panels **(C)** and **(D)**, we utilized the the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project where supragingival sites are known to have enriched aerobic microbes. Here, we test for the enrichment of aerobic microbes across all samples, and considered a true positive is when a sample is significantly enriched for aerobic microbes and labelled as supragingival." width="100%" />
+<img src="figures/sim_data_ss_hypo.png" alt="Type I error rate **(A)**, and power **(B)** across different parametric simulation scenarios. Confidence bounds were obtained using Agresti-Couli approach. False-positive rate **(C)** and true positive rate **(D)** evaluation of similar methods on real 16S rRNA data from the oral microbiome of the gingival site. For **(A)** and **(B)**, enrichment of a specified set was tested at the sample level using cILR and the Wilcoxon rank sum test at $\alpha$ of 0.05. For **(C)** and **(D)**, the set of aerobic microbes was tested for enrichment in all samples and was identified as correctly enriched if a significant $p$-value was obtained in supragingival samples." width="100%" />
 <p class="caption">
-Figure 1: Type I error and power of sample-level enrichment testing using cILR compared against a naive Wilcoxon Rank Sum test. Panel <strong>(A)</strong> presents type I error evaluated in parametric simulations under different set sizes, inter-taxa correlation and sparsity. Panel <strong>(B)</strong> presents power evaluated in parametric simulations under different effect sizes, inter-taxa correlation and sparsity. For panels <strong>(C)</strong> and <strong>(D)</strong>, we utilized the the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project where supragingival sites are known to have enriched aerobic microbes. Here, we test for the enrichment of aerobic microbes across all samples, and considered a true positive is when a sample is significantly enriched for aerobic microbes and labelled as supragingival.
+Figure 1: Type I error rate <strong>(A)</strong>, and power <strong>(B)</strong> across different parametric simulation scenarios. Confidence bounds were obtained using Agresti-Couli approach. False-positive rate <strong>(C)</strong> and true positive rate <strong>(D)</strong> evaluation of similar methods on real 16S rRNA data from the oral microbiome of the gingival site. For <strong>(A)</strong> and <strong>(B)</strong>, enrichment of a specified set was tested at the sample level using cILR and the Wilcoxon rank sum test at <span class="math inline">\(\alpha\)</span> of 0.05. For <strong>(C)</strong> and <strong>(D)</strong>, the set of aerobic microbes was tested for enrichment in all samples and was identified as correctly enriched if a significant <span class="math inline">\(p\)</span>-value was obtained in supragingival samples.
 </p>
 </div>
 </div>
-<div id="classification-capacity" class="section level3">
-<h3>Classification capacity</h3>
+<div id="predictive-models" class="section level3">
+<h3>Predictive models</h3>
 <div class="figure" style="text-align: left"><span id="fig:figure2"></span>
-<img src="poster_files/figure-html/figure2-1.png" alt="Classification power of cILR scores compared against existing methods in the gene set testing literature that generates single sample enrichment scores. Area under the ROC curve (AUC) measures whether scores highly rank samples where the set of interest is known to be enriched. Panel **(A)** presents results under different parametric simulation conditions while panel **(B)** presents similar analyses on the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project. In this data set, supragingival sites are known to have enriched aerobic microbes." width="100%" />
+<img src="figures/data_prediction_plot.png" alt="Classification performance of a naive random forest model using cILR scores as inputs compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn's disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing (Gevers et al.) and whole genome shotgun sequencing (Nielsen et al.)" width="100%" />
 <p class="caption">
-Figure 2: Classification power of cILR scores compared against existing methods in the gene set testing literature that generates single sample enrichment scores. Area under the ROC curve (AUC) measures whether scores highly rank samples where the set of interest is known to be enriched. Panel <strong>(A)</strong> presents results under different parametric simulation conditions while panel <strong>(B)</strong> presents similar analyses on the 16S rRNA sequencing dataset of supragingival and subgingival sites from the Human Microbiome Project. In this data set, supragingival sites are known to have enriched aerobic microbes.
+Figure 2: Classification performance of a naive random forest model using cILR scores as inputs compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn’s disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing (Gevers et al.) and whole genome shotgun sequencing (Nielsen et al.)
 </p>
 </div>
 </div>
-<div id="utilizing-enrichment-scores-for-disease-prediction" class="section level3">
-<h3>Utilizing enrichment scores for disease prediction</h3>
+<div id="differential-abundance-analysis" class="section level3">
+<h3>Differential abundance analysis</h3>
 <div class="figure" style="text-align: left"><span id="fig:figure3"></span>
-<img src="poster_files/figure-html/figure3-1.png" alt="Classification performance of a standard random forest model using cILR scores compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn's disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing [@gevers2014] and whole genome shotgun sequencing [@nielsen2014]" width="100%" />
+<img src="figures/data_diff_ab.png" alt="Differential abundance analysis using corncob, DESeq2 and cILR with either Wilcoxon rank sum test or Welch's t-test. Panel \textbf{(A)} shows type I error results as the proportion of significant genera after 500 iterations where case/control status was assigned randomly to each sample. Panel \textbf{(B)} shows true positive rate results as the proportion of significant genera who are either obligate anaerobes or aerobes. Both evaluations use 16S rRNA gene sequencing data from HMP. Type I error evaluation used stool samples while the true positive rate evaluation used samples from the gingival site." width="100%" />
 <p class="caption">
-Figure 3: Classification performance of a standard random forest model using cILR scores compared against existing methods in gene set testing literature and the standard centered-log ratio transformation approach. The learning task involves predicting patients with inflammatory bowel disease (including Crohn’s disease and ulcerative colitis) versus controls. Data sets used span both 16S rRNA sequencing <span class="citation">(<a href="#ref-gevers2014" role="doc-biblioref">Gevers et al. 2014</a>)</span> and whole genome shotgun sequencing <span class="citation">(<a href="#ref-nielsen2014" role="doc-biblioref">Nielsen et al. 2014</a>)</span>
+Figure 3: Differential abundance analysis using corncob, DESeq2 and cILR with either Wilcoxon rank sum test or Welch’s t-test. Panel  shows type I error results as the proportion of significant genera after 500 iterations where case/control status was assigned randomly to each sample. Panel  shows true positive rate results as the proportion of significant genera who are either obligate anaerobes or aerobes. Both evaluations use 16S rRNA gene sequencing data from HMP. Type I error evaluation used stool samples while the true positive rate evaluation used samples from the gingival site.
 </p>
 </div>
 </div>
@@ -375,17 +375,6 @@ Figure 3: Classification performance of a standard random forest model using cIL
 <div id="methods" class="section level2">
 <h2>Methods</h2>
 <p><img src="poster_diagrams_white.png" width="100%" style="display: block; margin: auto;" /></p>
-</div>
-<div id="references" class="section level2 unnumbered">
-<h2>References</h2>
-<div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-gevers2014" class="csl-entry">
-Gevers, Dirk, Subra Kugathasan, Lee A. Denson, Yoshiki Vázquez-Baeza, Will Van Treuren, Boyu Ren, Emma Schwager, et al. 2014. <span>“The <span>Treatment</span>-<span>Naive Microbiome</span> in <span>New</span>-<span>Onset Crohn</span>’s <span>Disease</span>.”</span> <em>Cell Host &amp; Microbe</em> 15 (3): 382–92. <a href="https://doi.org/10.1016/j.chom.2014.02.005">https://doi.org/10.1016/j.chom.2014.02.005</a>.
-</div>
-<div id="ref-nielsen2014" class="csl-entry">
-Nielsen, H. Bjørn, Mathieu Almeida, Agnieszka Sierakowska Juncker, Simon Rasmussen, Junhua Li, Shinichi Sunagawa, Damian R. Plichta, et al. 2014. <span>“Identification and Assembly of Genomes and Genetic Elements in Complex Metagenomic Samples Without Using Reference Genomes.”</span> <em>Nature Biotechnology</em> 32 (8): 822–28. <a href="https://doi.org/10.1038/nbt.2939">https://doi.org/10.1038/nbt.2939</a>.
-</div>
-</div>
 </div>
 
 </div>
@@ -396,6 +385,19 @@ Nielsen, H. Bjørn, Mathieu Almeida, Agnieszka Sierakowska Juncker, Simon Rasmus
 </div>
 </div>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+var script = document.createElement("script");
+script.type = "text/javascript";
+var src = "true";
+if (src === "" || src === "true") src = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML";
+if (location.protocol !== "file:" && /^https?:/.test(src))
+src = src.replace(/^https?:/, '');
+script.src = src;
+document.getElementsByTagName("head")[0].appendChild(script);
+})();
+</script>
 
 
 </body>

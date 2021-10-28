@@ -1,0 +1,44 @@
+---
+name: Quang
+surname: Nguyen
+position: "Ph.D. Student"
+address: "Dartmouth College"
+# profilepic: mariecurie.jpg
+www: qpmnguyen.com
+email: "quangpmnguyen@gmail.com"
+twitter: quangpmnguyen
+github: qpmnguyen
+linkedin: qpmnguyen
+date: "`r format(Sys.time(), '%B %Y')`"
+aboutme: "I am currently a Ph.D. candidate in the Quantitative Biomedical Sciences program at Dartmouth College. I develop statistical tool for incorporating microbial function in epidemiological microbiome-outcome analyses. Looking for any opportunities in statistics, bioinformatics and epidemiology"
+output: vitae::twentyseconds
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+library(vitae)
+```
+
+This is a selected list portfolio projects, including both primary research contributions and side projects 
+
+# Research    
+
+# Software   
+  * **teaR**. An R package to perform taxonomic enrichment analysis. This package contains the primary implementation of the cILR method. Additionally, a unified interface and data structure for taxa-sets is provided, extending the existing `phyloseq` object commonly used in microbiome data analysis. 
+    * Built with: `R` 
+    * Links: [GitHub](https://github.com/qpmnguyen/teaR)
+  * **microbesim**. An R package to perform Monte Carlo simulations of microbiome count data. This package contains easy-to-use functions to generate synthetic counts under different distributional models. Supports predictive analysis, differential abundance analysis, and taxa-set enrichment analysis
+      * Built with: `R`
+      * Links: [GitHub](https://github.com/qpmnguyen/microbesim)
+
+# Data analysis    
+# Data visualization  
+  * **TidyTuesday**. Submissions to the weekly TidyTuesday challenge in creating data visualizations using `R`.
+    * Built with: `R`, `ggplot`, `flexdashboard`
+    * Links: [GitHub](https://github.com/qpmnguyen/qn_tidytuesday), [flexdashboard](https://www.qpmnguyen.com/extras/flexdash.html)
+
+# Bioinformatics    
+  - **Bulk RNA-seq data pipeline**: Sample bulk RNA-seq data pipeline with the [Himes et al. data set](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0099625)(Study ID: SRP033351), taking data from raw reads to differential expression analysis.  
+    - Built with: `snakemake`, `STAR`, `htseq-counts`, `salmon`, `sra-tools`, `DESeq2`, `R`, `Python`. 
+    - Links: [GitHub](https://github.com/qpmnguyen/rna_seq_pipeline)  
+
